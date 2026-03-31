@@ -50,7 +50,7 @@ export default function Footer() {
                     {/* Bottom Footer Area */}
                     <div className="pt-12 mt-12 border-t border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="text-3xl font-bold tracking-tighter text-white font-headline">
-                            skphotography
+                            Sk Photography
                         </div>
                         <div className="text-zinc-500 text-sm font-manrope">
                             The SK - Photography © 2026. All rights reserved.
