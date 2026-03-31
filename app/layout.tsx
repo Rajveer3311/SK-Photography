@@ -23,7 +23,7 @@ export const metadata: Metadata = {
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
+        url: '/SK Logo.jpg',
         type: 'image/svg+xml',
       },
     ],
