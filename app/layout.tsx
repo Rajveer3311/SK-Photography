@@ -9,7 +9,7 @@ const playfairDisplay = Playfair_Display({ subsets: ["latin"], variable: '--font
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Chintu Pathak - Photography',
+  title: 'SK - Photography',
   description: 'Enchanting, Evocative, Inspiring. Professional photography portfolio specializing in weddings, fashion, and commercial work.',
   generator: 'v0.app',
   icons: {
