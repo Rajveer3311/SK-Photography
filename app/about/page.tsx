@@ -31,7 +31,7 @@ export default function AboutPage() {
                         </h1>
                         <div className="space-y-8 text-on-surface-variant leading-relaxed text-lg font-light max-w-2xl">
                             <p>
-                                I am Chintu Pathak, a passionate photographer based in Rajasthan, India, with over 15 years of experience in the art of freezing time and capturing life's most precious moments.
+                                I am Subhash Rawat, a passionate photographer based in Rajasthan, India, with over 15 years of experience in the art of freezing time and capturing life's most precious moments.
                             </p>
                             <p>
                                 Photography has been an integral part of my life, and my journey began with a fascination for storytelling through visuals. Over the years, I have had the privilege of working with a diverse range of clients and capturing a multitude of emotions, from candid expressions to breathtaking landscapes.
@@ -66,7 +66,7 @@ export default function AboutPage() {
                         <div className="relative aspect-3/4 overflow-hidden grayscale hover:grayscale-0 transition-all duration-1000 group">
                             <img alt="Portrait of Photographer" className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-2000" data-alt="Sophisticated professional black and white portrait of a photographer with sharp lighting and minimal background in an editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuJKmdqWiDdafMGJwnMaybeuSZpf1Bl0mV3J47G8VFPPOM5dY2SFkeEcgRfLCzqvLkKpNK4Q12nb_U0ewPfZy39uTTescP8kuO_FAiayVwmtkZ3Eq0C1rfhuhgnwKZNVtN1QkKEw4F3-PNGde8kHa5J3v2TuoStIy8SjCOAELHnjQ0iLJHx4V_7igyktOWuQfe33IZABw1NI4SF5WczmFZa3tWs3dpy_dXoBznWeKXnM5nIQAPLeugJhUtNn_d7Hsx2Tz2AiQo29U" />
                             <div className="absolute bottom-0 right-0 bg-surface p-6 hidden lg:block">
-                                <p className="font-headline italic text-xl text-primary">Chintu Pathak</p>
+                                <p className="font-headline italic text-xl text-primary">Subhash Rawat</p>
                                 <p className="font-label uppercase tracking-widest text-[9px] text-secondary mt-1">Rajasthan, India</p>
                             </div>
                         </div>
