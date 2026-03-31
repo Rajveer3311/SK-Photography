@@ -73,7 +73,7 @@ export default function AboutPage() {
                         {/* Signature/Logo Detail */}
                         <div className="mt-12 flex justify-end">
                             <div className="text-right">
-                                <p className="font-headline italic text-4xl text-on-surface opacity-20 select-none">C. Pathak</p>
+                                <p className="font-headline italic text-4xl text-on-surface opacity-20 select-none">Subhash Rawat</p>
                                 <div className="h-[1px] w-24 bg-outline-variant mt-2 ml-auto opacity-30" />
                             </div>
                         </div>
