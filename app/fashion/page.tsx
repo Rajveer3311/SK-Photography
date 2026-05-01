@@ -1,17 +1,38 @@
-'use client'
+"use client";
 
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import FashionGallery from '@/components/FashionGallery'
-import ParallaxGridScroll from '@/components/ParallaxGridScroll'
+import { useEffect, useState } from "react";
+import Header from "@/components/Header";
+import ParallaxGridScroll from "@/components/ParallaxGridScroll";
+
+type GalleryResponse = {
+  categories: {
+    fashion: string[];
+  };
+};
 
 export default function FashionPage() {
-    return (
-        <div className="min-h-screen bg-background">
-            <main className="pt-20 md:pt-24 bg-white"/>
+  const [images, setImages] = useState<string[]>([]);
 
-                <ParallaxGridScroll title='FASHION' subtitle='Elegance, Beauty & Craft' />
+  useEffect(() => {
+    const load = async () => {
+      const response = await fetch("/api/upload");
+      if (!response.ok) return;
+      const data: GalleryResponse = await response.json();
+      setImages(data.categories.fashion ?? []);
+    };
 
-        </div>
-    )
+    load();
+  }, []);
+
+  return (
+    <main className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-20 bg-white" />
+      <ParallaxGridScroll
+        title="FASHION"
+        subtitle="Elegance, Beauty & Craft"
+        images={images}
+      />
+    </main>
+  );
 }

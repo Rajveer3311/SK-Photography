@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-const slides = [
+const slides1 = [
     'https://static.wixstatic.com/media/b7d251_c416a48476ef4853bb48a3dc1793ed66~mv2.jpg/v1/fill/w_3827,h_1763,q_90,enc_avif,quality_auto/b7d251_c416a48476ef4853bb48a3dc1793ed66~mv2.jpg',
     'https://static.wixstatic.com/media/b7d251_0bc3ec5af573425d9a69f7c0e8c335ff~mv2.jpg/v1/fill/w_4350,h_2004,q_90,enc_avif,quality_auto/b7d251_0bc3ec5af573425d9a69f7c0e8c335ff~mv2.jpg',
     'https://static.wixstatic.com/media/b7d251_59ac68c7f05e440184566a1387af9b87~mv2.jpg/v1/fill/w_4350,h_2004,q_90,enc_avif,quality_auto/b7d251_59ac68c7f05e440184566a1387af9b87~mv2.jpg',
 ]
 
-export default function HeroCarousel() {
+export default function HeroCarousel({ slidesArray}: { slidesArray: string[] }) {
+    const slides = slidesArray.map((slide) => slide);
+
+    console.log(slides)
     const [activeIndex, setActiveIndex] = useState(0)
     const intervalRef = useRef<number | null>(null)
 
