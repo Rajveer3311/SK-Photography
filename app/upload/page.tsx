@@ -68,7 +68,7 @@ const page = () => {
             <SelectContent>
               <SelectItem value="weddings">Weddings</SelectItem>
               <SelectItem value="fashion">Fashion</SelectItem>
-              <SelectItem value="preweddings">Pre-weddings</SelectItem>
+              <SelectItem value="pre-weddings">Pre-weddings</SelectItem>
               <SelectItem value="contactHome">Contact Home</SelectItem>
               <SelectItem value="footer">Footer</SelectItem>
               <SelectItem value="heroBanner">Hero Banner</SelectItem>

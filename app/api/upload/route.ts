@@ -1,49 +1,74 @@
+import { del, list, put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 
-const validCategories = ["weddings", "fashion", "preweddings", "contactHome", "footer", "heroBanner", "homecategories"] as const;
-const imageFilePattern = /\.(jpg|jpeg|png|webp|gif|avif)$/i;
+const validCategories = [
+  "weddings",
+  "fashion",
+  "preweddings",
+  "contactHome",
+  "footer",
+  "heroBanner",
+  "homecategories",
+] as const;
 
-async function getCategoryImages(category: (typeof validCategories)[number]) {
-  const categoryDir = path.join(process.cwd(), "public", "images", category);
+type Category = (typeof validCategories)[number];
 
-  try {
-    const entries = await fs.readdir(categoryDir, { withFileTypes: true });
-    return entries
-      .filter((entry) => entry.isFile() && imageFilePattern.test(entry.name))
-      .map((entry) => `/images/${category}/${entry.name}`)
-      .sort((a, b) => b.localeCompare(a));
-  } catch {
-    return [];
-  }
+const categoryAliases: Record<string, Category> = {
+  weddings: "weddings",
+  fashion: "fashion",
+  preweddings: "preweddings",
+  "pre-weddings": "preweddings",
+  contactHome: "contactHome",
+  footer: "footer",
+  heroBanner: "heroBanner",
+  homecategories: "homecategories",
+};
+
+function normalizeCategory(value: string | null | undefined): Category | null {
+  if (!value) return null;
+  return categoryAliases[value] ?? null;
+}
+
+async function getCategoryImages(category: Category) {
+  const { blobs } = await list({
+    prefix: `images/${category}/`,
+    limit: 1000,
+  });
+  return blobs
+    .map((blob) => blob.url)
+    .sort((a, b) => b.localeCompare(a));
 }
 
 export async function GET() {
-  const categories = await Promise.all(
-    validCategories.map(async (category) => ({
-      category,
-      images: await getCategoryImages(category),
-    })),
-  );
+  try {
+    const categories = await Promise.all(
+      validCategories.map(async (category) => ({
+        category,
+        images: await getCategoryImages(category),
+      })),
+    );
 
-  return NextResponse.json({
-    categories: Object.fromEntries(
-      categories.map(({ category, images }) => [category, images]),
-    ),
-  });
+    return NextResponse.json({
+      categories: Object.fromEntries(
+        categories.map(({ category, images }) => [category, images]),
+      ),
+    });
+  } catch (error) {
+    console.error("Failed to load gallery images:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const category = formData.get("category") as string;
+    const category = normalizeCategory(formData.get("category") as string);
     const images = formData.getAll("images") as File[];
 
-    if (
-      !category ||
-      !validCategories.includes(category as (typeof validCategories)[number])
-    ) {
+    if (!category) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 
@@ -54,19 +79,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const uploadDir = path.join(process.cwd(), "public", "images", category);
-
-    // Ensure the directory exists
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    // Validate category limits
-    let existingCount = 0;
-    try {
-      const entries = await fs.readdir(uploadDir, { withFileTypes: true });
-      existingCount = entries.filter((entry) => entry.isFile() && imageFilePattern.test(entry.name)).length;
-    } catch {
-      existingCount = 0;
-    }
+    // Validate category limits based on existing blobs.
+    const { blobs: existingImages } = await list({
+      prefix: `images/${category}/`,
+      limit: 1000,
+    });
+    const existingCount = existingImages.length;
 
     const newTotal = existingCount + images.length;
 
@@ -90,17 +108,22 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // Generate unique filename
+      if (!image.type.startsWith("image/")) {
+        continue;
+      }
+
       const timestamp = Date.now();
       const originalName = image.name.replace(/[^a-zA-Z0-9.-]/g, "_");
       const filename = `${timestamp}-${originalName}`;
-      const filepath = path.join(uploadDir, filename);
+      const blobPath = `images/${category}/${filename}`;
 
-      // Convert File to Buffer and write
-      const buffer = Buffer.from(await image.arrayBuffer());
-      await fs.writeFile(filepath, buffer);
+      const { url } = await put(blobPath, image, {
+        access: "public",
+        addRandomSuffix: false,
+        contentType: image.type,
+      });
 
-      uploadedFiles.push(filename);
+      uploadedFiles.push(url);
     }
 
     return NextResponse.json({
@@ -118,38 +141,36 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { category, filename } = (await request.json()) as {
+    const { imagePath, category, filename } = (await request.json()) as {
+      imagePath?: string;
       category?: string;
       filename?: string;
     };
 
-    if (
-      !category ||
-      !validCategories.includes(category as (typeof validCategories)[number])
-    ) {
-      return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+    if (imagePath) {
+      await del(imagePath);
+      return NextResponse.json({ message: "Image deleted successfully" });
     }
 
-    if (!filename || filename.includes("/") || filename.includes("\\")) {
-      return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
+    const normalizedCategory = normalizeCategory(category);
+    if (!normalizedCategory || !filename) {
+      return NextResponse.json(
+        { error: "imagePath or (category + filename) is required" },
+        { status: 400 },
+      );
     }
 
-    const targetPath = path.join(
-      process.cwd(),
-      "public",
-      "images",
-      category,
-      filename,
-    );
-    await fs.unlink(targetPath);
+    const expectedPath = `images/${normalizedCategory}/${filename}`;
+    const { blobs } = await list({ prefix: expectedPath, limit: 1 });
+    const targetBlob = blobs.find((blob) => blob.pathname === expectedPath);
+
+    if (!targetBlob) {
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    }
+    await del(targetBlob.url);
 
     return NextResponse.json({ message: "Image deleted successfully" });
   } catch (error: unknown) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === "ENOENT") {
-      return NextResponse.json({ error: "Image not found" }, { status: 404 });
-    }
-
     console.error("Delete error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

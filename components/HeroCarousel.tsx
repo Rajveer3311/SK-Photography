@@ -9,9 +9,7 @@ const slides1 = [
 ]
 
 export default function HeroCarousel({ slidesArray}: { slidesArray: string[] }) {
-    const slides = slidesArray.map((slide) => slide);
-
-    console.log(slides)
+    const slides = slidesArray.length > 0 ? slidesArray : slides1;
     const [activeIndex, setActiveIndex] = useState(0)
     const intervalRef = useRef<number | null>(null)
 
@@ -24,13 +22,14 @@ export default function HeroCarousel({ slidesArray}: { slidesArray: string[] }) 
     }
 
     useEffect(() => {
+        if (slides.length === 0) return;
         intervalRef.current = window.setInterval(nextSlide, 5000)
         return () => {
             if (intervalRef.current !== null) {
                 window.clearInterval(intervalRef.current)
             }
         }
-    }, [])
+    }, [slides.length])
 
     return (
         <section className="relative min-h-screen w-full overflow-hidden bg-black text-white">

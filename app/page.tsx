@@ -195,11 +195,13 @@ export default function Home() {
               </h2>
               <div className="relative w-full flex">
                 <div className="w-1/3 aspect-3/4 mr-8 mt-40">
-                  <img
-                    alt="Detail"
-                    className="w-full h-full object-cover"
-                    src={images.contactHome[0]}
-                  />
+                  {images.contactHome[0] && (
+                    <img
+                      alt="Detail"
+                      className="w-full h-full object-cover"
+                      src={images.contactHome[0]}
+                    />
+                  )}
                 </div>
                 <div className="w-1/2 aspect-3/5 bg-gray-100">
                   {images.contactHome[1] && (

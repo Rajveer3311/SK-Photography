@@ -67,9 +67,6 @@ export default function ManageImagesPage() {
   }, []);
 
   const deleteImage = async (imagePath: string) => {
-    const filename = imagePath.split("/").pop();
-    if (!filename) return;
-
     try {
       setDeletingPath(imagePath);
       setMessage("");
@@ -77,8 +74,7 @@ export default function ManageImagesPage() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          category: selectedCategory,
-          filename,
+          imagePath,
         }),
       });
 
